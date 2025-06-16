@@ -3,23 +3,24 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import AccessGuard from '@/components/AccessGuard';
+import { getRandomCodeWord } from '@/constants'; // adjust path as needed
+import { addDoc, collection } from "firebase/firestore";
+import { db } from "@/config/firebase.ts"; // or wherever your db is exported
 
 export default function Home() {
+  const [codeWord] = useState(getRandomCodeWord);
   const router = useRouter();
   const [timeLeft, setTimeLeft] = useState(300);
   const [timerSmall, setTimerSmall] = useState(false);
   const [blinkColor, setBlinkColor] = useState('red');
   const [fadeOverlay, setFadeOverlay] = useState(true);
-  const [codeWord] = useState(() => {
-    const words = ['Falcon', 'Bridge', 'Crate', 'Torch', 'Spire', 'Drum', 'Fang', 'Box', 'Quill', 'Dust', 'Bell', 'Shell', 'Key', 'Brick', 'Crown', 'Stone', 'Frost', 'Flame', 'Root', 'Vault'];
-    return words[Math.floor(Math.random() * words.length)];
-  });
 
   const formatTime = (seconds: number) => {
     const min = Math.floor(seconds / 60).toString().padStart(2, '0');
     const sec = (seconds % 60).toString().padStart(2, '0');
     return `${min}:${sec}`;
   };
+
 
   const beep = (duration = 100) => {
     const ctx = new (window.AudioContext)();
@@ -40,6 +41,23 @@ export default function Home() {
       window.speechSynthesis.speak(utterance);
     }
   };
+
+const pstTimestamp = new Date().toLocaleString("en-US", { timeZone: "America/Los_Angeles" });
+
+const createDocument = async()=>{
+try {
+  const docRef = await addDoc(collection(db, "submissions"), {
+    CODEWORD: getRandomCodeWord(),
+    TimeStamp: pstTimestamp,
+    imageBinary: window.resizedImageBase64
+  });
+  console.log("Document written with ID: ", docRef.id);
+} catch (e) {
+  console.error("Error adding document: ", e);
+}
+ 
+console.log('CHOOCHED')
+}
 
   useEffect(() => {
     const timestamp = localStorage.getItem('access_time');
@@ -114,6 +132,7 @@ export default function Home() {
     };
   }, []);
 
+
   return (
     <AccessGuard>
       <div style={{
@@ -165,24 +184,129 @@ export default function Home() {
           }}>
             {codeWord}
           </div>
+            {typeof window !== 'undefined' && window.resizedImageBase64 ? (
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  margin: '0 auto 14px auto',
+                  background: '#222e',
+                  border: '2px dashed #22bb66',
+                  borderRadius: '10px',
+                  padding: '6px 18px',
+                  width: '210px',
+                  minHeight: '36px',
+                  boxShadow: '0 1px 6px #0001',
+                }}
+              >
+                <img
+                  src={window.resizedImageBase64}
+                  alt="Preview"
+                  style={{
+                    maxWidth: '180px',
+                    maxHeight: '120px',
+                    borderRadius: '8px',
+                    border: '2px solid #22bb66',
+                    marginBottom: '6px',
+                  }}
+                />
+                <span style={{ color: '#22bb66', fontWeight: 600, fontSize: '1rem' }}>Image Selected</span>
+              </div>
+            ) : (
+              <label
+                htmlFor="image-upload"
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  margin: '0 auto 14px auto',
+                  cursor: 'pointer',
+                  background: '#222e',
+                  border: '2px dashed #3388ff',
+                  borderRadius: '10px',
+                  padding: '6px 18px',
+                  transition: 'border-color 0.2s',
+                  color: '#3388ff',
+                  fontWeight: 600,
+                  fontSize: '1rem',
+                  width: '210px',
+                  minHeight: '36px',
+                  boxShadow: '0 1px 6px #0001',
+                }}
+              >
+                <span style={{ marginRight: '10px', fontSize: '1.3rem' }}>📷</span>
+                <span>Upload</span>
+                <input
+                  id="image-upload"
+                  type="file"
+                  accept="image/*"
+                  style={{ display: 'none' }}
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
 
-          <button style={{
-            padding: '6px 10px',
-            fontSize: '1rem',
-            fontFamily: "'Orbitron', sans-serif",
-            borderRadius: '8px',
-            background: '#2266bb',
-            color: '#fff',
-            border: 'none',
-            cursor: 'pointer',
-            minWidth: '100px'
-          }}
-            onClick={() => alert('Take Picture Clicked (placeholder)')}
-          >
-            📷 Submit
-          </button>
-        </div>
+                    const img = new window.Image();
+                    const reader = new FileReader();
 
+                    reader.onload = (ev) => {
+                      img.onload = () => {
+                        const maxDim = 500;
+                        let { width, height } = img;
+                        if (width > maxDim || height > maxDim) {
+                          if (width > height) {
+                            height = (height * maxDim) / width;
+                            width = maxDim;
+                          } else {
+                            width = (width * maxDim) / height;
+                            height = maxDim;
+                          }
+                        }
+                        const canvas = document.createElement('canvas');
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        if (ctx) {
+                          ctx.drawImage(img, 0, 0, width, height);
+                          const base64 = canvas.toDataURL('image/jpeg', 0.85);
+                          window.resizedImageBase64 = base64;
+                          // Force re-render
+                          if (typeof window !== 'undefined') {
+                            window.dispatchEvent(new Event('storage'));
+                          }
+                        }
+                      };
+                      img.src = ev.target?.result as string;
+                    };
+
+                    reader.readAsDataURL(file);
+                  }}
+                />
+              </label>
+            )}
+            
+            <button
+              style={{
+                padding: '6px 10px',
+                fontSize: '1rem',
+                fontFamily: "'Orbitron', sans-serif",
+                borderRadius: '8px',
+                background: typeof window !== 'undefined' && window.resizedImageBase64 ? '#22bb66' : '#888',
+                color: '#fff',
+                border: 'none',
+                cursor: typeof window !== 'undefined' && window.resizedImageBase64 ? 'pointer' : 'not-allowed',
+                minWidth: '100px',
+                opacity: typeof window !== 'undefined' && window.resizedImageBase64 ? 1 : 0.6,
+                transition: 'background 0.2s, opacity 0.2s',
+              }}
+              onClick={() => createDocument()}
+              disabled={typeof window === 'undefined' || !window.resizedImageBase64}
+            >
+              📷 Submit
+            </button>
+          </div>
         <style jsx>{`
           @keyframes flash {
             0%, 100% { opacity: 1; }
@@ -194,6 +318,7 @@ export default function Home() {
           }
         `}</style>
       </div>
+      
     </AccessGuard>
   );
 }

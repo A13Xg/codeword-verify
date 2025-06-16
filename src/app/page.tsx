@@ -49,21 +49,61 @@ export default function AccessPage() {
   };
 
   return (
-    <div className="container" style={{ fontFamily: "'Share Tech Mono', monospace", backgroundColor: '#121212', color: '#eee', minHeight: '100vh', padding: '2rem' }}>
+    <div
+      className="container"
+      style={{
+      fontFamily: "'Share Tech Mono', monospace",
+      backgroundColor: '#121212',
+      color: '#eee',
+      minHeight: '100vh',
+      padding: '2rem',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      textAlign: 'center',
+      }}
+    >
       <h1>Enter Access Code</h1>
-      <input type='file' accept="image/png, image/gif, image/jpeg"/>
-      <form onSubmit={handleSubmit}>
+      <form
+        onSubmit={handleSubmit}
+        style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}
+      >
         <input
           type="password"
           placeholder="Access Code"
           value={code}
           onChange={(e) => setCode(e.target.value)}
-          style={{ fontSize: '1.5rem', padding: '0.5rem', marginRight: '1rem', borderRadius: '4px', border: '1px solid #444', backgroundColor: '#222', color: '#eee' }}
+          style={{
+        fontSize: '1.5rem',
+        padding: '0.5rem',
+        marginBottom: '1rem',
+        borderRadius: '4px',
+        border: '1px solid #444',
+        backgroundColor: '#222',
+        color: '#eee',
+        textAlign: 'center',
+        width: '250px',
+        maxWidth: '100%',
+          }}
           autoFocus
         />
-        <button type="submit" style={{ fontSize: '1.5rem', padding: '0.5rem 1rem', borderRadius: '4px', backgroundColor: '#0070f3', color: 'white', border: 'none', cursor: 'pointer' }}>
-          Enter
-        </button>
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '1rem' }}>
+          <button
+            type="submit"
+            style={{
+              fontSize: '1.5rem',
+              padding: '0.5rem 5rem',
+              borderRadius: '4px',
+              backgroundColor: '#0070f3',
+              color: 'white',
+              border: 'none',
+              cursor: 'pointer'
+            }}
+          >
+            Enter
+          </button>
+        </div>
       </form>
       {error && <p style={{ color: 'red', marginTop: '1rem' }}>{error}</p>}
     </div>
