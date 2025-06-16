@@ -1,8 +1,13 @@
 // components/AccessGuard.js
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { ReactNode } from "react";
 
-export default function AccessGuard({ children }) {
+type AccessGuardProps = {
+  children: ReactNode;
+};
+
+function AccessGuard({ children }: AccessGuardProps) {
   const router = useRouter();
   const [authorized, setAuthorized] = useState(false);
 
@@ -23,3 +28,5 @@ export default function AccessGuard({ children }) {
 
   return authorized ? children : null;
 }
+
+export default AccessGuard;

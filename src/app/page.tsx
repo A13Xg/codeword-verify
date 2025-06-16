@@ -28,15 +28,16 @@ export default function AccessPage() {
 
     if (code === 'drew') {
       // Unlock AudioContext on first user interaction
-      if (!window.AudioContext) {
-        const AudioContext = window.AudioContext;
-        window.AudioContext = new AudioContext();
+      // Unlock AudioContext on first user interaction
+      const AudioContextClass = window.AudioContext;
+      if (AudioContextClass) {
+        const audioCtx = new AudioContextClass();
 
         // Play a very short silent sound to unlock audio on some browsers
-        const oscillator = window.AudioContext.createOscillator();
-        oscillator.connect(window.AudioContext.destination);
+        const oscillator = audioCtx.createOscillator();
+        oscillator.connect(audioCtx.destination);
         oscillator.start();
-        oscillator.stop(window.AudioContext.currentTime + 0.01);
+        oscillator.stop(audioCtx.currentTime + 0.01);
       }
 
       localStorage.setItem('access_granted', 'true');
