@@ -23,20 +23,20 @@ export default function AccessPage() {
     }
   }, [router]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e:React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (code === 'drew') {
       // Unlock AudioContext on first user interaction
-      if (!window.sharedAudioContext) {
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        window.sharedAudioContext = new AudioContext();
+      if (!window.AudioContext) {
+        const AudioContext = window.AudioContext;
+        window.AudioContext = new AudioContext();
 
         // Play a very short silent sound to unlock audio on some browsers
-        const oscillator = window.sharedAudioContext.createOscillator();
-        oscillator.connect(window.sharedAudioContext.destination);
+        const oscillator = window.AudioContext.createOscillator();
+        oscillator.connect(window.AudioContext.destination);
         oscillator.start();
-        oscillator.stop(window.sharedAudioContext.currentTime + 0.01);
+        oscillator.stop(window.AudioContext.currentTime + 0.01);
       }
 
       localStorage.setItem('access_granted', 'true');

@@ -15,14 +15,14 @@ export default function Home() {
     return words[Math.floor(Math.random() * words.length)];
   });
 
-  const formatTime = (seconds) => {
+  const formatTime = (seconds: number) => {
     const min = Math.floor(seconds / 60).toString().padStart(2, '0');
     const sec = (seconds % 60).toString().padStart(2, '0');
     return `${min}:${sec}`;
   };
 
   const beep = (duration = 100) => {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const ctx = new (window.AudioContext)();
     const oscillator = ctx.createOscillator();
     const gainNode = ctx.createGain();
     oscillator.type = 'sine';
@@ -34,7 +34,7 @@ export default function Home() {
     oscillator.stop(ctx.currentTime + duration / 1000);
   };
 
-  const speak = (text) => {
+  const speak = (text: string) => {
     if ('speechSynthesis' in window) {
       const utterance = new SpeechSynthesisUtterance(text);
       window.speechSynthesis.speak(utterance);
