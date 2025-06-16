@@ -1,103 +1,70 @@
-import Image from "next/image";
+// pages/index.js
+'use client'
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
-export default function Home() {
+export default function AccessPage() {
+  const [code, setCode] = useState('');
+  const [error, setError] = useState('');
+  const router = useRouter();
+
+  useEffect(() => {
+    const access = localStorage.getItem('access_granted');
+    const timestamp = localStorage.getItem('access_time');
+
+    if (access && timestamp) {
+      const now = Date.now();
+      if (now - parseInt(timestamp) < 5 * 60 * 1000) {
+        router.push('/home');
+      } else {
+        localStorage.removeItem('access_granted');
+        localStorage.removeItem('access_time');
+      }
+    }
+  }, [router]);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    if (code === 'drew') {
+      // Unlock AudioContext on first user interaction
+      if (!window.sharedAudioContext) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        window.sharedAudioContext = new AudioContext();
+
+        // Play a very short silent sound to unlock audio on some browsers
+        const oscillator = window.sharedAudioContext.createOscillator();
+        oscillator.connect(window.sharedAudioContext.destination);
+        oscillator.start();
+        oscillator.stop(window.sharedAudioContext.currentTime + 0.01);
+      }
+
+      localStorage.setItem('access_granted', 'true');
+      localStorage.setItem('access_time', Date.now().toString());
+      router.push('/home');
+    } else {
+      setError('Invalid access code');
+    }
+  };
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
+    <div className="container" style={{ fontFamily: "'Share Tech Mono', monospace", backgroundColor: '#121212', color: '#eee', minHeight: '100vh', padding: '2rem' }}>
+      <h1>Enter Access Code</h1>
+      <input type='file' accept="image/png, image/gif, image/jpeg"/>
+      <form onSubmit={handleSubmit}>
+        <input
+          type="password"
+          placeholder="Access Code"
+          value={code}
+          onChange={(e) => setCode(e.target.value)}
+          style={{ fontSize: '1.5rem', padding: '0.5rem', marginRight: '1rem', borderRadius: '4px', border: '1px solid #444', backgroundColor: '#222', color: '#eee' }}
+          autoFocus
         />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+        <button type="submit" style={{ fontSize: '1.5rem', padding: '0.5rem 1rem', borderRadius: '4px', backgroundColor: '#0070f3', color: 'white', border: 'none', cursor: 'pointer' }}>
+          Enter
+        </button>
+      </form>
+      {error && <p style={{ color: 'red', marginTop: '1rem' }}>{error}</p>}
     </div>
   );
 }

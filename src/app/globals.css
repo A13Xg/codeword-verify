@@ -1,26 +1,47 @@
-@import "tailwindcss";
+/* styles/globals.css */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron&display=swap');
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Orbitron', monospace, sans-serif;
+  background-color: #121212;
+  color: #fff;
+  font-family: 'Inter', sans-serif;
+  height: 100%;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+input, button {
+  font-size: 1rem;
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: none;
+  margin-top: 1rem;
+  width: 100%;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+input {
+  background-color: #1e1e1e;
+  color: #fff;
+  border: 1px solid #333;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+button {
+  background-color: #3b82f6;
+  color: white;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #2563eb;
+}
+
+.container {
+  max-width: 400px;
+  margin: auto;
+  padding: 1.5rem;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
