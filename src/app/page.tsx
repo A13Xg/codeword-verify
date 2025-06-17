@@ -6,11 +6,14 @@ import { useRouter } from 'next/navigation';
 export default function AccessPage() {
   const [code, setCode] = useState('');
   const [error, setError] = useState('');
+  const [image, setImage] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
     const access = localStorage.getItem('access_granted');
     const timestamp = localStorage.getItem('access_time');
+    localStorage.removeItem("confirmation_image");
+    setImage(null);
 
     if (access && timestamp) {
       const now = Date.now();

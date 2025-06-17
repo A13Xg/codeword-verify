@@ -7,6 +7,9 @@ import { getRandomCodeWord } from '@/constants'; // adjust path as needed
 import { addDoc, collection } from "firebase/firestore";
 import { db } from "@/config/firebase.ts"; // or wherever your db is exported
 
+
+
+
 export default function Home() {
   const [codeWord] = useState(getRandomCodeWord);
   const router = useRouter();
@@ -14,6 +17,7 @@ export default function Home() {
   const [timerSmall, setTimerSmall] = useState(false);
   const [blinkColor, setBlinkColor] = useState('red');
   const [fadeOverlay, setFadeOverlay] = useState(true);
+  const [image, setImage] = useState<string | null>(null);
 
   const formatTime = (seconds: number) => {
     const min = Math.floor(seconds / 60).toString().padStart(2, '0');
@@ -44,22 +48,36 @@ export default function Home() {
 
 const pstTimestamp = new Date().toLocaleString("en-US", { timeZone: "America/Los_Angeles" });
 
-const createDocument = async()=>{
-try {
-  const docRef = await addDoc(collection(db, "submissions"), {
-    CODEWORD: getRandomCodeWord(),
-    TimeStamp: pstTimestamp,
-    imageBinary: window.resizedImageBase64
-  });
-  console.log("Document written with ID: ", docRef.id);
-} catch (e) {
-  console.error("Error adding document: ", e);
-}
- 
-console.log('CHOOCHED')
-}
+const createDocument = async () => {
+  try {
+    localStorage.clear();
+    setImage(null);
+    const codeword = codeWord; // use the same codeword shown to the user
+    const imageBinary = window.resizedImageBase64;
+    const timestamp = pstTimestamp;
+
+    const docRef = await addDoc(collection(db, "submissions"), {
+      CODEWORD: codeword,
+      TimeStamp: timestamp,
+      imageBinary: imageBinary
+    });
+    console.log("Document written with ID: ", docRef.id);
+
+    // Save to localStorage for confirmation page
+    localStorage.setItem("confirmation_codeword", codeword);
+    localStorage.setItem("confirmation_image", imageBinary);
+    localStorage.setItem("confirmation_timestamp", timestamp);
+
+    // Redirect to confirmation page
+    router.push("/confirmation");
+  } catch (e) {
+    console.error("Error adding document: ", e);
+  }
+  console.log('CHOOCHED');
+};
 
   useEffect(() => {
+    const base64 = null;
     const timestamp = localStorage.getItem('access_time');
     if (!timestamp) return;
     setTimeLeft(300);
@@ -149,6 +167,7 @@ console.log('CHOOCHED')
         )}
 
         <div style={{
+          alignItems: 'center',
           position: 'absolute',
           top: timerSmall ? '20px' : '50%',
           right: timerSmall ? '20px' : '50%',
@@ -166,6 +185,26 @@ console.log('CHOOCHED')
         }}>
           <div style={{ fontSize: timerSmall ? '1rem' : '1.8rem', whiteSpace: 'nowrap' }}>Time Remaining:</div>
           <div style={{ fontSize: timerSmall ? '1.5rem' : '4.2rem' }}>{formatTime(timeLeft)}</div>
+          <button
+            style={{
+              alignItems: 'center',
+              background: "#ffe066",
+              color: "#222",
+              border: "none",
+              borderRadius: "6px",
+              fontWeight: 700,
+              fontSize: "1rem",
+              cursor: "pointer",
+              boxShadow: "0 1px 4px #0002"
+            }}
+            onClick={() => {
+              localStorage.removeItem("access_granted");
+              localStorage.removeItem("access_time");
+              window.location.href = "/";
+            }}
+          >
+            Reset
+          </button>
         </div>
 
         <div style={{ zIndex: 0, textAlign: 'center', paddingTop: '160px' }}>
@@ -247,7 +286,6 @@ console.log('CHOOCHED')
                   onChange={async (e) => {
                     const file = e.target.files?.[0];
                     if (!file) return;
-
                     const img = new window.Image();
                     const reader = new FileReader();
 
