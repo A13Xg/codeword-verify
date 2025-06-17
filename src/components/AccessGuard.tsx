@@ -24,7 +24,7 @@ function AccessGuard({ children }: AccessGuardProps) {
     } else {
       setAuthorized(true);
     }
-  }, []);
+  }, [router]);
 
   return authorized ? children : null;
 }

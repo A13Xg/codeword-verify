@@ -1,6 +1,13 @@
 'use client'
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
+
+declare global {
+  interface Window {
+    resizedImageBase64?: string | null;
+  }
+}
 
 export default function ConfirmationPage() {
     const [codeword, setCodeword] = useState<string | null>(null);
@@ -23,8 +30,9 @@ export default function ConfirmationPage() {
         // Clear access-related data
         localStorage.removeItem("access_granted");
         localStorage.removeItem("access_time");
+        
 
-        // Remove any global variables
+    // Remove any global variables
         if (typeof window !== "undefined") {
           window.resizedImageBase64 = null;
         }
@@ -45,7 +53,7 @@ export default function ConfirmationPage() {
                 <strong>Codeword:</strong> {codeword}
             </div>
             {image && (
-                <img
+                <Image
                     src={image}
                     alt="Uploaded"
                     style={{ maxWidth: "320px", maxHeight: "220px", borderRadius: "8px", border: "2px solid #3388ff", boxShadow: "0 2px 12px #0003", marginBottom: "20px" }}

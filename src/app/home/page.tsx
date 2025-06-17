@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation';
 import AccessGuard from '@/components/AccessGuard';
 import { getRandomCodeWord } from '@/constants'; // adjust path as needed
 import { addDoc, collection } from "firebase/firestore";
-import { db } from "@/config/firebase.ts"; // or wherever your db is exported
+import { db } from "@/config/firebase"; // or wherever your db is exported
+import Image from "next/image";
 
 
 
@@ -17,7 +18,6 @@ export default function Home() {
   const [timerSmall, setTimerSmall] = useState(false);
   const [blinkColor, setBlinkColor] = useState('red');
   const [fadeOverlay, setFadeOverlay] = useState(true);
-  const [image, setImage] = useState<string | null>(null);
 
   const formatTime = (seconds: number) => {
     const min = Math.floor(seconds / 60).toString().padStart(2, '0');
@@ -51,7 +51,6 @@ const pstTimestamp = new Date().toLocaleString("en-US", { timeZone: "America/Los
 const createDocument = async () => {
   try {
     localStorage.clear();
-    setImage(null);
     const codeword = codeWord; // use the same codeword shown to the user
     const imageBinary = window.resizedImageBase64;
     const timestamp = pstTimestamp;
@@ -65,7 +64,7 @@ const createDocument = async () => {
 
     // Save to localStorage for confirmation page
     localStorage.setItem("confirmation_codeword", codeword);
-    localStorage.setItem("confirmation_image", imageBinary);
+    localStorage.setItem("confirmation_image", imageBinary ?? "");
     localStorage.setItem("confirmation_timestamp", timestamp);
 
     // Redirect to confirmation page
@@ -77,7 +76,6 @@ const createDocument = async () => {
 };
 
   useEffect(() => {
-    const base64 = null;
     const timestamp = localStorage.getItem('access_time');
     if (!timestamp) return;
     setTimeLeft(300);
@@ -148,7 +146,7 @@ const createDocument = async () => {
       clearTimeout(animateTimeout);
       clearInterval(blinkInterval);
     };
-  }, []);
+  }, [router]);
 
 
   return (
@@ -240,7 +238,7 @@ const createDocument = async () => {
                   boxShadow: '0 1px 6px #0001',
                 }}
               >
-                <img
+                <Image
                   src={window.resizedImageBase64}
                   alt="Preview"
                   style={{

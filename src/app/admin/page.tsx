@@ -1,8 +1,9 @@
 'use client'
 import { useEffect, useState } from "react";
-import { collection, getDocs, deleteDoc, doc, query, orderBy, limit, writeBatch } from "firebase/firestore";
+import { collection, getDocs, deleteDoc, doc, writeBatch } from "firebase/firestore";
 import { db } from "@/config/firebase"; // adjust path as needed
 import React, { useRef } from "react";
+import Image from "next/image"; 
 
 interface Submission {
   id: string;
@@ -173,10 +174,8 @@ function DangerArea({ submissions, setSubmissions }: { submissions: Submission[]
               <td style={{ padding: "10px", color: "#eee" }}>{sub.CODEWORD}</td>
               <td style={{ padding: "10px" }}>
                 {sub.imageBinary ? (
-                  <img
-                    src={sub.imageBinary}
-                    alt="submission"
-                    style={{ maxWidth: "120px", maxHeight: "80px", borderRadius: "6px", border: "1px solid #3388ff" }}
+                  <Image
+                    src={sub.imageBinary} alt='Image' width={320} height={220} style={{ borderRadius: 8 }}
                   />
                 ) : (
                   <span style={{ color: "#888" }}>No image</span>
