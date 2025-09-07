@@ -12,7 +12,7 @@ import Image from "next/image";
 
 
 export default function Home() {
-  const [codeWord] = useState(getRandomCodeWord);
+  const [codeWord] = useState(getRandomCodeWord()); // <-- Call the function here
   const router = useRouter();
   const [timeLeft, setTimeLeft] = useState(300);
   const [timerSmall, setTimerSmall] = useState(false);
