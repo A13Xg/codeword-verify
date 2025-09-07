@@ -1,4 +1,4 @@
-const wordlist = [
+const words = [
   'Falcon', 'Bridge', 'Crate', 'Torch', 'Spire', 'Drum', 'Fang', 'Box', 'Quill', 'Dust',
   'Bell', 'Shell', 'Key', 'Brick', 'Crown', 'Stone', 'Frost', 'Flame', 'Root', 'Vault',
   'River', 'Cloud', 'Leaf', 'Sword', 'Wheel', 'Mask', 'Wing', 'Moon', 'Star', 'Hill',
@@ -10,13 +10,9 @@ const wordlist = [
   'Shore', 'Wave', 'Sand', 'Stone', 'Log', 'Branch', 'Twig', 'Seed', 'Berry', 'Vine'
 ];
 
-// Helper function to generate a random two-digit number as a string
-function getRandomTwoDigitNumber(): string {
-  return String(Math.floor(Math.random() * 90) + 10);
-}
 
-export function getRandomCodeWordWithNumber(): string {
-  const word = wordlist[Math.floor(Math.random() * wordlist.length)];
-  const number = getRandomTwoDigitNumber();
-  return word + number;
+export function getRandomCodeWord() {
+  const word = words[Math.floor(Math.random() * words.length)];
+  const num = Math.floor(Math.random() * 90) + 10; // random 2-digit number
+  return word + num;
 }
